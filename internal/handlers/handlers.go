@@ -1,0 +1,96 @@
+package handlers
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
+
+	"github.com/Gautam-J/Folio/internal/models"
+)
+
+type WeatherFetcher interface {
+	Get(ctx context.Context, lat, lon float64) (models.WeatherData, error)
+}
+
+type ImageRenderer interface {
+	Render(ctx context.Context, data models.WeatherData, width, height int) (string, error)
+}
+
+type Server struct {
+	accessToken string
+	lat         float64
+	lon         float64
+	refreshRate int
+	weather     WeatherFetcher
+	renderer    ImageRenderer
+	outputDir   string
+}
+
+func NewServer(accessToken string, lat, lon float64, refreshRate int, weather WeatherFetcher, renderer ImageRenderer, outputDir string) *Server {
+	return &Server{
+		accessToken: accessToken,
+		lat:         lat,
+		lon:         lon,
+		refreshRate: refreshRate,
+		weather:     weather,
+		renderer:    renderer,
+		outputDir:   outputDir,
+	}
+}
+
+func (s *Server) HandleDisplay(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("access-token") != s.accessToken {
+		writeJSON(w, http.StatusUnauthorized, models.DisplayResponse{
+			Status: http.StatusUnauthorized,
+			Error:  "invalid access token",
+		})
+		return
+	}
+
+	width, werr := strconv.Atoi(r.Header.Get("png-width"))
+	height, herr := strconv.Atoi(r.Header.Get("png-height"))
+	if werr != nil || herr != nil || width <= 0 || height <= 0 {
+		writeJSON(w, http.StatusBadRequest, models.DisplayResponse{
+			Status: http.StatusBadRequest,
+			Error:  "missing or invalid png-width/png-height headers",
+		})
+		return
+	}
+
+	weatherData, err := s.weather.Get(r.Context(), s.lat, s.lon)
+	if err != nil {
+		writeJSON(w, http.StatusBadGateway, models.DisplayResponse{
+			Status: http.StatusBadGateway,
+			Error:  "weather unavailable",
+		})
+		return
+	}
+
+	filename, err := s.renderer.Render(r.Context(), weatherData, width, height)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, models.DisplayResponse{
+			Status: http.StatusInternalServerError,
+			Error:  "render failed",
+		})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, models.DisplayResponse{
+		Status:      0,
+		ImageURL:    fmt.Sprintf("http://%s/images/%s", r.Host, filename),
+		Filename:    filename,
+		RefreshRate: s.refreshRate,
+	})
+}
+
+func (s *Server) ImagesHandler() http.Handler {
+	return http.StripPrefix("/images/", http.FileServer(http.Dir(s.outputDir)))
+}
+
+func writeJSON(w http.ResponseWriter, status int, body models.DisplayResponse) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(body)
+}
