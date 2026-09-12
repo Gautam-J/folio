@@ -2,7 +2,7 @@
 
 A self-hosted TRMNL-compatible server that renders a weather dashboard for a Kindle Paperwhite running [KOReader](https://koreader.rocks/) with the [trmnl-koreader](https://github.com/usetrmnl/trmnl-koreader) plugin.
 
-Folio speaks TRMNL's [BYOD/BYOS](https://docs.trmnl.com/go/diy/byod-s) protocol: the Kindle polls a single HTTP endpoint on a timer, Folio renders an HTML template (weather data + [TRMNL's own framework CSS](https://trmnl.com/framework)) to a PNG via headless Chromium, and hands back a JSON response pointing at the image.
+Folio speaks TRMNL's [BYOD/BYOS](https://docs.trmnl.com/go/diy/byod-s) protocol: the Kindle polls a single HTTP endpoint on a timer, Folio renders a dashboard of widgets (weather + date/time, using [TRMNL's own framework CSS](https://trmnl.com/framework)) to a PNG via headless Chromium, and hands back a JSON response pointing at the image.
 
 ## How it works
 
@@ -11,8 +11,9 @@ Kindle (KOReader + trmnl-koreader plugin)
    │  GET /api/display   (access-token, png-width, png-height headers)
    ▼
 Folio server
-   │  1. fetch current weather (Open-Meteo, no API key needed)
-   │  2. render templates/weather.html with that data
+   │  1. each widget renders itself (weather fetches Open-Meteo, no API key needed;
+   │     date/time just reads the clock)
+   │  2. compose the widget fragments into templates/dashboard.html
    │  3. screenshot it with headless Chromium (chromedp) at the requested size
    │  4. write generated/current.png
    ▼
@@ -96,15 +97,16 @@ make clean             # remove bin/ and generated/
 
 - `cmd/main.go` — entry point, wiring, HTTP server
 - `internal/config` — YAML config loading and validation
+- `internal/widget` — the `Widget` interface and its implementations (`WeatherWidget`, `DateTimeWidget`); each owns its own data fetch and template
 - `internal/weather` — Open-Meteo client
-- `internal/render` — HTML → PNG rendering via chromedp
+- `internal/render` — composes widget fragments into the dashboard and renders it to a PNG via chromedp
 - `internal/handlers` — the `/api/display` and `/images/` HTTP handlers
-- `templates/weather.html` — the dashboard template
-- `docs/superpowers/specs`, `docs/superpowers/plans` — the design spec and implementation plan this project was built from
+- `templates/dashboard.html` — the dashboard shell template; `templates/widgets/` — the per-widget fragment templates
+- `docs/superpowers/specs`, `docs/superpowers/plans` — the design specs and implementation plans this project was built from
 
 ## Scope
 
-Current scope is a single weather widget, LAN-only, with a shared-token auth model. A full TRMNL-grid-style dashboard (weather + calendar + tasks) and remote access are potential future directions, not yet built.
+Current scope is a multi-widget dashboard (weather + date/time), LAN-only, with a shared-token auth model. GitHub stats, daily quotes, mental models, word of the day, and RSS tech news widgets, plus remote access, are potential future directions — see `docs/superpowers/specs/2026-09-12-dashboard-mashup-design.md`'s "Future work" section — not yet built.
 
 ## License
 
