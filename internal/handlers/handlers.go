@@ -1,3 +1,4 @@
+// internal/handlers/handlers.go
 package handlers
 
 import (
@@ -10,33 +11,26 @@ import (
 	"time"
 
 	"github.com/Gautam-J/Folio/internal/models"
+	"github.com/Gautam-J/Folio/internal/widget"
 )
 
-type WeatherFetcher interface {
-	Get(ctx context.Context, lat, lon float64) (models.WeatherData, error)
-}
-
-type ImageRenderer interface {
-	Render(ctx context.Context, data models.WeatherData, width, height int) (string, error)
+type DashboardRenderer interface {
+	RenderDashboard(ctx context.Context, widgets []widget.Widget, width, height int) (string, error)
 }
 
 type Server struct {
 	accessToken string
-	lat         float64
-	lon         float64
 	refreshRate int
-	weather     WeatherFetcher
-	renderer    ImageRenderer
+	widgets     []widget.Widget
+	renderer    DashboardRenderer
 	outputDir   string
 }
 
-func NewServer(accessToken string, lat, lon float64, refreshRate int, weather WeatherFetcher, renderer ImageRenderer, outputDir string) *Server {
+func NewServer(accessToken string, refreshRate int, widgets []widget.Widget, renderer DashboardRenderer, outputDir string) *Server {
 	return &Server{
 		accessToken: accessToken,
-		lat:         lat,
-		lon:         lon,
 		refreshRate: refreshRate,
-		weather:     weather,
+		widgets:     widgets,
 		renderer:    renderer,
 		outputDir:   outputDir,
 	}
@@ -61,20 +55,10 @@ func (s *Server) HandleDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	weatherData, err := s.weather.Get(r.Context(), s.lat, s.lon)
-	if err != nil {
-		slog.Error("weather fetch failed", "error", err)
-		writeJSON(w, http.StatusBadGateway, models.DisplayResponse{
-			Status: http.StatusBadGateway,
-			Error:  "weather unavailable",
-		})
-		return
-	}
-
 	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
 	defer cancel()
 
-	filename, err := s.renderer.Render(ctx, weatherData, width, height)
+	filename, err := s.renderer.RenderDashboard(ctx, s.widgets, width, height)
 	if err != nil {
 		slog.Error("render failed", "error", err)
 		writeJSON(w, http.StatusInternalServerError, models.DisplayResponse{

@@ -13,6 +13,7 @@ import (
 	"github.com/Gautam-J/Folio/internal/handlers"
 	"github.com/Gautam-J/Folio/internal/render"
 	"github.com/Gautam-J/Folio/internal/weather"
+	"github.com/Gautam-J/Folio/internal/widget"
 )
 
 const outputDir = "generated"
@@ -31,7 +32,21 @@ func main() {
 
 	weatherClient := weather.NewClient(weather.DefaultBaseURL)
 
-	renderer, err := render.NewRenderer("templates/weather.html", outputDir)
+	weatherWidget, err := widget.NewWeatherWidget(weatherClient, cfg.Latitude, cfg.Longitude, "templates/widgets/weather.html")
+	if err != nil {
+		slog.Error("failed to init weather widget", "error", err)
+		os.Exit(1)
+	}
+
+	dateTimeWidget, err := widget.NewDateTimeWidget("templates/widgets/datetime.html", time.Now)
+	if err != nil {
+		slog.Error("failed to init date/time widget", "error", err)
+		os.Exit(1)
+	}
+
+	widgets := []widget.Widget{weatherWidget, dateTimeWidget}
+
+	renderer, err := render.NewRenderer("templates/dashboard.html", outputDir)
 	if err != nil {
 		slog.Error("failed to init renderer", "error", err)
 		os.Exit(1)
@@ -39,10 +54,8 @@ func main() {
 
 	server := handlers.NewServer(
 		cfg.AccessToken,
-		cfg.Latitude,
-		cfg.Longitude,
 		cfg.RefreshRateSeconds,
-		weatherClient,
+		widgets,
 		renderer,
 		outputDir,
 	)

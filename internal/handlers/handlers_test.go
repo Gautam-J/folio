@@ -5,21 +5,23 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"html/template"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/Gautam-J/Folio/internal/models"
+	"github.com/Gautam-J/Folio/internal/widget"
 )
 
-type stubWeather struct {
-	data models.WeatherData
+type stubWidget struct {
+	html template.HTML
 	err  error
 }
 
-func (s stubWeather) Get(ctx context.Context, lat, lon float64) (models.WeatherData, error) {
-	return s.data, s.err
+func (s stubWidget) Render(ctx context.Context) (template.HTML, error) {
+	return s.html, s.err
 }
 
 type stubRenderer struct {
@@ -27,7 +29,7 @@ type stubRenderer struct {
 	err      error
 }
 
-func (s stubRenderer) Render(ctx context.Context, data models.WeatherData, width, height int) (string, error) {
+func (s stubRenderer) RenderDashboard(ctx context.Context, widgets []widget.Widget, width, height int) (string, error) {
 	return s.filename, s.err
 }
 
@@ -46,8 +48,8 @@ func newTestRequest(token, width, height string) *http.Request {
 }
 
 func TestHandleDisplay_Success(t *testing.T) {
-	srv := NewServer("secret", 12.9, 77.6, 1800,
-		stubWeather{data: models.WeatherData{Temperature: 21.5}},
+	srv := NewServer("secret", 1800,
+		[]widget.Widget{stubWidget{html: "<p>weather</p>"}},
 		stubRenderer{filename: "current.png"},
 		t.TempDir(),
 	)
@@ -80,7 +82,7 @@ func TestHandleDisplay_Success(t *testing.T) {
 }
 
 func TestHandleDisplay_InvalidToken(t *testing.T) {
-	srv := NewServer("secret", 12.9, 77.6, 1800, stubWeather{}, stubRenderer{}, t.TempDir())
+	srv := NewServer("secret", 1800, nil, stubRenderer{}, t.TempDir())
 
 	req := newTestRequest("wrong", "1072", "1448")
 	rec := httptest.NewRecorder()
@@ -93,7 +95,7 @@ func TestHandleDisplay_InvalidToken(t *testing.T) {
 }
 
 func TestHandleDisplay_MissingDimensions(t *testing.T) {
-	srv := NewServer("secret", 12.9, 77.6, 1800, stubWeather{}, stubRenderer{}, t.TempDir())
+	srv := NewServer("secret", 1800, nil, stubRenderer{}, t.TempDir())
 
 	req := newTestRequest("secret", "", "")
 	rec := httptest.NewRecorder()
@@ -105,27 +107,8 @@ func TestHandleDisplay_MissingDimensions(t *testing.T) {
 	}
 }
 
-func TestHandleDisplay_WeatherError(t *testing.T) {
-	srv := NewServer("secret", 12.9, 77.6, 1800,
-		stubWeather{err: errors.New("boom")}, stubRenderer{}, t.TempDir(),
-	)
-
-	req := newTestRequest("secret", "1072", "1448")
-	rec := httptest.NewRecorder()
-
-	srv.HandleDisplay(rec, req)
-
-	if rec.Code != http.StatusBadGateway {
-		t.Fatalf("status = %d, want 502", rec.Code)
-	}
-}
-
 func TestHandleDisplay_RenderError(t *testing.T) {
-	srv := NewServer("secret", 12.9, 77.6, 1800,
-		stubWeather{data: models.WeatherData{Temperature: 20}},
-		stubRenderer{err: errors.New("boom")},
-		t.TempDir(),
-	)
+	srv := NewServer("secret", 1800, nil, stubRenderer{err: errors.New("boom")}, t.TempDir())
 
 	req := newTestRequest("secret", "1072", "1448")
 	rec := httptest.NewRecorder()
