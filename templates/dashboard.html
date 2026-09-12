@@ -47,8 +47,22 @@
     /* High/Low column beside the main temperature: top-aligned so it sits
        next to the big number rather than centered against the taller
        column (which also has the description row below the temp). */
-    .columns--temp { align-items: center; justify-content: flex-start; gap: calc(24px * var(--folio-scale)); }
-    .columns--temp .column:first-child { flex: none; width: auto; }
+    .columns--temp { align-items: center; justify-content: flex-start; gap: calc(12px * var(--folio-scale)); }
+    .columns--temp .weather-temp-value { flex: none; width: auto; }
+    /* Shared halftone dot pattern (quote background, temp sidebar) — a
+       radial-gradient grid rather than an image, so it scales cleanly with
+       --folio-scale and needs no asset. */
+    .dotted-bg {
+      background-color: #fff;
+      background-image: radial-gradient(circle, #000 calc(1px * var(--folio-scale)), transparent calc(1px * var(--folio-scale)));
+      background-size: calc(5px * var(--folio-scale)) calc(5px * var(--folio-scale));
+    }
+    .weather-sidebar {
+      width: calc(16px * var(--folio-scale));
+      align-self: stretch;
+      flex-shrink: 0;
+    }
+    .weather-highlow { margin-left: calc(12px * var(--folio-scale)); }
     .weather-highlow {
       display: flex;
       flex-direction: column;
@@ -114,6 +128,9 @@
     .dashboard-strip {
       text-align: center;
     }
+    .dashboard-bottom {
+      padding: calc(10px * var(--folio-scale)) calc(16px * var(--folio-scale));
+    }
     .dashboard-progress__row {
       display: flex;
       align-items: center;
@@ -149,7 +166,7 @@
       </div>
       <div class="dashboard-footer">
         <div class="dashboard-strip">{{.Strip}}</div>
-        <div class="dashboard-bottom">{{.Bottom}}</div>
+        <div class="dashboard-bottom dotted-bg">{{.Bottom}}</div>
       </div>
     </div>
   </div>
