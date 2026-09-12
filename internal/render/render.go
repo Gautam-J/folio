@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Gautam-J/Folio/internal/widget"
 	"github.com/chromedp/chromedp"
@@ -38,6 +39,7 @@ func NewRenderer(templatePath, outputDir string) (*Renderer, error) {
 // Main/Corner/Strip/Bottom are the four widget slots this milestone supports.
 type dashboardData struct {
 	Width  int
+	Now    time.Time
 	Main   template.HTML
 	Corner template.HTML
 	Strip  template.HTML
@@ -64,7 +66,7 @@ func (r *Renderer) buildDashboardHTML(ctx context.Context, widgets []widget.Widg
 	}
 
 	var buf bytes.Buffer
-	data := dashboardData{Width: width, Main: fragments[0], Corner: fragments[1], Strip: fragments[2], Bottom: fragments[3]}
+	data := dashboardData{Width: width, Now: time.Now(), Main: fragments[0], Corner: fragments[1], Strip: fragments[2], Bottom: fragments[3]}
 	if err := r.tmpl.Execute(&buf, data); err != nil {
 		return "", fmt.Errorf("execute template: %w", err)
 	}
