@@ -35,6 +35,9 @@ func TestGet_Success(t *testing.T) {
 	if data.Description != "Overcast" {
 		t.Errorf("Description = %q, want %q", data.Description, "Overcast")
 	}
+	if data.Icon != "cloudy" {
+		t.Errorf("Icon = %q, want %q", data.Icon, "cloudy")
+	}
 	if data.TempMin != 15.0 {
 		t.Errorf("TempMin = %v, want 15.0", data.TempMin)
 	}
@@ -115,6 +118,27 @@ func TestDescribeCode(t *testing.T) {
 	for _, tc := range cases {
 		if got := describeCode(tc.code); got != tc.want {
 			t.Errorf("describeCode(%d) = %q, want %q", tc.code, got, tc.want)
+		}
+	}
+}
+
+func TestIconForCode(t *testing.T) {
+	cases := []struct {
+		code int
+		want string
+	}{
+		{0, "clear"},
+		{2, "partly-cloudy"},
+		{3, "cloudy"},
+		{45, "fog"},
+		{63, "rain"},
+		{73, "snow"},
+		{95, "thunderstorm"},
+		{999, "cloudy"},
+	}
+	for _, tc := range cases {
+		if got := iconForCode(tc.code); got != tc.want {
+			t.Errorf("iconForCode(%d) = %q, want %q", tc.code, got, tc.want)
 		}
 	}
 }

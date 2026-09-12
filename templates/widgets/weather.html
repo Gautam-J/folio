@@ -1,49 +1,123 @@
 <!-- templates/widgets/weather.html -->
+{{define "icon-sun"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="4"/>
+  <line x1="12" y1="2" x2="12" y2="4"/>
+  <line x1="12" y1="20" x2="12" y2="22"/>
+  <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/>
+  <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
+  <line x1="2" y1="12" x2="4" y2="12"/>
+  <line x1="20" y1="12" x2="22" y2="12"/>
+  <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/>
+  <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>
+</svg>{{end}}
+
+{{define "icon-partly-cloudy"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="17" cy="6" r="2.3"/>
+  <line x1="17" y1="2" x2="17" y2="3"/>
+  <line x1="20.5" y1="6" x2="19.4" y2="6"/>
+  <line x1="19.7" y1="3" x2="19" y2="3.7"/>
+  <path d="M12.9 13.5h-0.69A4.4 4.4 0 1 0 7.95 19h4.95a2.75 2.75 0 0 0 0-5.5z"/>
+</svg>{{end}}
+
+{{define "icon-cloud"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+</svg>{{end}}
+
+{{define "icon-fog"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="3" y1="7" x2="21" y2="7"/>
+  <line x1="5" y1="11" x2="19" y2="11"/>
+  <line x1="3" y1="15" x2="21" y2="15"/>
+  <line x1="5" y1="19" x2="19" y2="19"/>
+</svg>{{end}}
+
+{{define "icon-rain"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16.8 7h-0.76A4.8 4.8 0 1 0 11.4 13h5.4a3 3 0 0 0 0-6z"/>
+  <line x1="8" y1="16" x2="7" y2="19"/>
+  <line x1="12" y1="16" x2="11" y2="19"/>
+  <line x1="16" y1="16" x2="15" y2="19"/>
+</svg>{{end}}
+
+{{define "icon-snow"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16.8 7h-0.76A4.8 4.8 0 1 0 11.4 13h5.4a3 3 0 0 0 0-6z"/>
+  <circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/>
+  <circle cx="12" cy="18" r="1" fill="currentColor" stroke="none"/>
+  <circle cx="16" cy="18" r="1" fill="currentColor" stroke="none"/>
+</svg>{{end}}
+
+{{define "icon-thunderstorm"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16.8 7h-0.76A4.8 4.8 0 1 0 11.4 13h5.4a3 3 0 0 0 0-6z"/>
+  <polyline points="12,15 9,19 12,19 10,22"/>
+</svg>{{end}}
+
+{{define "icon-humidity"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2C9 6 6 10 6 13.5a6 6 0 0 0 12 0C18 10 15 6 12 2z"/>
+</svg>{{end}}
+
+{{define "icon-wind"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 8h10a2 2 0 1 0-2-2"/>
+  <path d="M3 12h14a2.5 2.5 0 1 1-2.5 2.5"/>
+  <path d="M3 16h7"/>
+</svg>{{end}}
+
+{{define "icon-up"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="6 15 12 9 18 15"/>
+</svg>{{end}}
+
+{{define "icon-down"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="6 9 12 15 18 9"/>
+</svg>{{end}}
+
+{{define "icon-sunrise"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="2" y1="18" x2="22" y2="18"/>
+  <path d="M8 18a4 4 0 0 1 8 0"/>
+  <line x1="12" y1="2" x2="12" y2="6"/>
+  <polyline points="9 5 12 2 15 5"/>
+</svg>{{end}}
+
+{{define "icon-sunset"}}<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="2" y1="18" x2="22" y2="18"/>
+  <path d="M8 18a4 4 0 0 1 8 0"/>
+  <line x1="12" y1="2" x2="12" y2="6"/>
+  <polyline points="9 3 12 6 15 3"/>
+</svg>{{end}}
+
 <div class="layout layout--col gap--large">
   <div class="columns">
     <div class="column">
       <span class="value value--xxlarge">{{printf "%.0f" .Temperature}}&deg;C</span>
-      <span class="label weather-description">{{.Description}}</span>
+      <div class="weather-description-row">
+        <span class="weather-icon weather-icon--description">
+          {{if eq .Icon "clear"}}{{template "icon-sun"}}
+          {{else if eq .Icon "partly-cloudy"}}{{template "icon-partly-cloudy"}}
+          {{else if eq .Icon "cloudy"}}{{template "icon-cloud"}}
+          {{else if eq .Icon "fog"}}{{template "icon-fog"}}
+          {{else if eq .Icon "rain"}}{{template "icon-rain"}}
+          {{else if eq .Icon "snow"}}{{template "icon-snow"}}
+          {{else if eq .Icon "thunderstorm"}}{{template "icon-thunderstorm"}}
+          {{else}}{{template "icon-cloud"}}{{end}}
+        </span>
+        <span class="label weather-description">{{.Description}}</span>
+      </div>
     </div>
   </div>
   <div class="columns columns--stat">
-    <div class="column">
-      <span class="label">Humidity: {{.Humidity}}%</span>
-    </div>
-    <div class="column">
-      <span class="label">Wind: {{printf "%.1f" .WindSpeed}} km/h</span>
-    </div>
+    <div class="column">{{template "icon-humidity"}}<span class="label">Humidity: {{.Humidity}}%</span></div>
+    <div class="column">{{template "icon-wind"}}<span class="label">Wind: {{printf "%.1f" .WindSpeed}} km/h</span></div>
   </div>
   <div class="columns columns--stat">
-    <div class="column">
-      <span class="label">High: {{printf "%.0f" .TempMax}}&deg;C</span>
-    </div>
-    <div class="column">
-      <span class="label">Low: {{printf "%.0f" .TempMin}}&deg;C</span>
-    </div>
+    <div class="column">{{template "icon-up"}}<span class="label">High: {{printf "%.0f" .TempMax}}&deg;C</span></div>
+    <div class="column">{{template "icon-down"}}<span class="label">Low: {{printf "%.0f" .TempMin}}&deg;C</span></div>
   </div>
   <div class="columns columns--stat">
-    <div class="column">
-      <span class="label">Sunrise: {{.Sunrise.Format "15:04"}}</span>
-    </div>
-    <div class="column">
-      <span class="label">Sunset: {{.Sunset.Format "15:04"}}</span>
-    </div>
+    <div class="column">{{template "icon-sunrise"}}<span class="label">Sunrise: {{.Sunrise.Format "15:04"}}</span></div>
+    <div class="column">{{template "icon-sunset"}}<span class="label">Sunset: {{.Sunset.Format "15:04"}}</span></div>
   </div>
   <div class="columns columns--stat">
-    <div class="column">
-      <span class="label">Rain chance: {{.PrecipProbability}}%</span>
-    </div>
-    <div class="column">
-      <span class="label">Gusts: {{printf "%.0f" .WindGusts}} km/h</span>
-    </div>
+    <div class="column">{{template "icon-rain"}}<span class="label">Rain chance: {{.PrecipProbability}}%</span></div>
+    <div class="column">{{template "icon-wind"}}<span class="label">Gusts: {{printf "%.0f" .WindGusts}} km/h</span></div>
   </div>
   <div class="columns columns--stat">
-    <div class="column">
-      <span class="label">UV index: {{printf "%.1f" .UVIndex}}</span>
-    </div>
-    <div class="column">
-      <span class="label">Cloud: {{.CloudCover}}%</span>
-    </div>
+    <div class="column">{{template "icon-sun"}}<span class="label">UV index: {{printf "%.1f" .UVIndex}}</span></div>
+    <div class="column">{{template "icon-cloud"}}<span class="label">Cloud: {{.CloudCover}}%</span></div>
   </div>
 </div>

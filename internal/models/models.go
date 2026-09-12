@@ -7,6 +7,7 @@ type WeatherData struct {
 	Humidity          int
 	WindSpeed         float64
 	Description       string
+	Icon              string
 	FetchedAt         time.Time
 	TempMin           float64
 	TempMax           float64

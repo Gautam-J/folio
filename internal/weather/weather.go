@@ -132,6 +132,7 @@ func (c *Client) fetch(ctx context.Context, url string) (models.WeatherData, err
 		Humidity:          parsed.Current.RelativeHumidity,
 		WindSpeed:         parsed.Current.WindSpeed,
 		Description:       describeCode(parsed.Current.WeatherCode),
+		Icon:              iconForCode(parsed.Current.WeatherCode),
 		FetchedAt:         time.Now(),
 		TempMin:           firstFloat(parsed.Daily.TempMin),
 		TempMax:           firstFloat(parsed.Daily.TempMax),
@@ -173,4 +174,37 @@ func describeCode(code int) string {
 		return desc
 	}
 	return "Unknown"
+}
+
+// wmoIconGroups maps WMO weather codes to one of the icon keys weather.html
+// has an SVG for: clear, partly-cloudy, cloudy, fog, rain, snow, thunderstorm.
+var wmoIconGroups = map[int]string{
+	0:  "clear",
+	1:  "clear",
+	2:  "partly-cloudy",
+	3:  "cloudy",
+	45: "fog",
+	48: "fog",
+	51: "rain",
+	53: "rain",
+	55: "rain",
+	61: "rain",
+	63: "rain",
+	65: "rain",
+	71: "snow",
+	73: "snow",
+	75: "snow",
+	80: "rain",
+	81: "rain",
+	82: "rain",
+	95: "thunderstorm",
+	96: "thunderstorm",
+	99: "thunderstorm",
+}
+
+func iconForCode(code int) string {
+	if icon, ok := wmoIconGroups[code]; ok {
+		return icon
+	}
+	return "cloudy"
 }

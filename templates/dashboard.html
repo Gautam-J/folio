@@ -45,8 +45,32 @@
        second column starts at the same x across every stat row, regardless
        of how long each row's first label is. */
     .columns--stat { gap: 0; justify-content: flex-start; }
-    .columns--stat .column { flex: none; width: auto; }
+    .columns--stat .column {
+      flex: none;
+      width: auto;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: calc(6px * var(--folio-scale));
+    }
     .columns--stat .column:first-child { width: calc(200px * var(--folio-scale)); }
+    /* Icons: sized off --folio-scale like everything else. The description
+       icon (next to "Overcast" etc.) is bigger than the per-stat icons. */
+    .wicon {
+      width: calc(18px * var(--folio-scale));
+      height: calc(18px * var(--folio-scale));
+      flex-shrink: 0;
+    }
+    .weather-description-row {
+      display: flex;
+      align-items: center;
+      gap: calc(8px * var(--folio-scale));
+    }
+    .weather-icon--description .wicon {
+      width: calc(30px * var(--folio-scale));
+      height: calc(30px * var(--folio-scale));
+    }
     .dashboard-corner {
       position: absolute;
       top: calc(16px * var(--folio-scale));
