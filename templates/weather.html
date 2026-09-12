@@ -7,6 +7,20 @@
   <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #fff; }
     .screen, .view { width: 100% !important; height: 100% !important; }
+    /* TRMNL's framework pins .layout to a fixed 800x480 box (via --screen-w/
+       --screen-h) regardless of the .screen/.view overrides above. Left in
+       place, it clips/overflows once fonts are scaled up for larger canvases. */
+    .layout { height: 100%; }
+    /* TRMNL's framework sizes fonts/gaps for its 800x480 baseline. Scale them
+       to the actual rendered canvas so text stays readable at other sizes. */
+    :root { --folio-scale: calc({{.Width}} / 800); }
+    .value--xxlarge { font-size: calc(96px * var(--folio-scale)); line-height: calc(108px * var(--folio-scale)); }
+    .label { font-size: calc(16px * var(--folio-scale)); }
+    .layout.gap--large { gap: calc(20px * var(--folio-scale)); }
+    /* Shrink-wrap paired stats so they sit together instead of stretching
+       across the full row and leaving a large empty gap between them. */
+    .columns--stat { gap: calc(60px * var(--folio-scale)); }
+    .columns--stat .column { flex: none; width: auto; }
   </style>
 </head>
 <body class="environment trmnl">
@@ -19,7 +33,7 @@
             <span class="label">{{.Description}}</span>
           </div>
         </div>
-        <div class="columns">
+        <div class="columns columns--stat">
           <div class="column">
             <span class="label">Humidity: {{.Humidity}}%</span>
           </div>
@@ -27,7 +41,7 @@
             <span class="label">Wind: {{printf "%.1f" .WindSpeed}} km/h</span>
           </div>
         </div>
-        <div class="columns">
+        <div class="columns columns--stat">
           <div class="column">
             <span class="label">High: {{printf "%.0f" .TempMax}}&deg;C</span>
           </div>
@@ -35,7 +49,7 @@
             <span class="label">Low: {{printf "%.0f" .TempMin}}&deg;C</span>
           </div>
         </div>
-        <div class="columns">
+        <div class="columns columns--stat">
           <div class="column">
             <span class="label">Sunrise: {{.Sunrise.Format "15:04"}}</span>
           </div>
@@ -43,7 +57,7 @@
             <span class="label">Sunset: {{.Sunset.Format "15:04"}}</span>
           </div>
         </div>
-        <div class="columns">
+        <div class="columns columns--stat">
           <div class="column">
             <span class="label">Rain chance: {{.PrecipProbability}}%</span>
           </div>
@@ -51,7 +65,7 @@
             <span class="label">Gusts: {{printf "%.0f" .WindGusts}} km/h</span>
           </div>
         </div>
-        <div class="columns">
+        <div class="columns columns--stat">
           <div class="column">
             <span class="label">UV index: {{printf "%.1f" .UVIndex}}</span>
           </div>

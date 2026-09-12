@@ -33,9 +33,18 @@ func NewRenderer(templatePath, outputDir string) (*Renderer, error) {
 	return &Renderer{tmpl: tmpl, outputDir: outputDir}, nil
 }
 
+// templateData adds the requested render dimensions to the weather data so
+// the template can scale fonts/spacing to the actual canvas size instead of
+// TRMNL's fixed 800x480 baseline.
+type templateData struct {
+	models.WeatherData
+	Width  int
+	Height int
+}
+
 func (r *Renderer) Render(ctx context.Context, data models.WeatherData, width, height int) (string, error) {
 	var htmlBuf bytes.Buffer
-	if err := r.tmpl.Execute(&htmlBuf, data); err != nil {
+	if err := r.tmpl.Execute(&htmlBuf, templateData{WeatherData: data, Width: width, Height: height}); err != nil {
 		return "", fmt.Errorf("execute template: %w", err)
 	}
 
