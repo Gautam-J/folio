@@ -6,8 +6,10 @@ import (
 	"context"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Gautam-J/Folio/internal/models"
 	"github.com/chromedp/chromedp"
@@ -51,7 +53,7 @@ func (r *Renderer) Render(ctx context.Context, data models.WeatherData, width, h
 	allocCtx, cancelAlloc := chromedp.NewExecAllocator(ctx, opts...)
 	defer cancelAlloc()
 
-	browserCtx, cancelBrowser := chromedp.NewContext(allocCtx)
+	browserCtx, cancelBrowser := chromedp.NewContext(allocCtx, chromedp.WithErrorf(logChromedpError))
 	defer cancelBrowser()
 
 	var pngBuf []byte
@@ -71,4 +73,15 @@ func (r *Renderer) Render(ctx context.Context, data models.WeatherData, width, h
 	}
 
 	return filename, nil
+}
+
+// chromedp v0.10.0 (pinned to keep go.mod at go 1.24.1) ships a cdproto
+// schema that predates the "Loopback" IPAddressSpace value this Pi's newer
+// Chromium sends, so every render logs a harmless unmarshal error for it.
+func logChromedpError(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	if strings.Contains(msg, "unknown IPAddressSpace value: Loopback") {
+		return
+	}
+	slog.Error(msg)
 }
