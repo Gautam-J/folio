@@ -108,7 +108,7 @@ make clean             # remove bin/ and generated/
 
 ## Scope
 
-Current scope is a multi-widget dashboard (weather, date/time, a random quote, and week/month/year progress bars), LAN-only, with a shared-token auth model. GitHub stats, mental models, word of the day, and RSS tech news widgets are potential future directions — see `docs/superpowers/specs/2026-09-12-dashboard-mashup-design.md`'s "Future work" section — not yet built. Two more ZenQuotes-backed widgets are also on the list: "On this day" (`today.zenquotes.io/api`) and an inspirational image (`zenquotes.io/api/image`). An xkcd comic widget (`https://xkcd.com/<random_number>/info.0.json`, returns an image) is on the list too.
+Current scope is a multi-widget dashboard (weather, date/time, a random quote, and week/month/year progress bars), LAN-only, with a shared-token auth model. GitHub stats and RSS tech news widgets are potential future directions — see `docs/superpowers/specs/2026-09-12-dashboard-mashup-design.md`'s "Future work" section — not yet built. Two more ZenQuotes-backed widgets are also on the list: "On this day" (`today.zenquotes.io/api`) and an inspirational image (`zenquotes.io/api/image`). An xkcd comic widget (`https://xkcd.com/<random_number>/info.0.json`, returns an image) is on the list too.
 
 ## License
 
