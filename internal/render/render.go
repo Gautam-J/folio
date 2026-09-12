@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Gautam-J/Folio/internal/models"
+	"github.com/Gautam-J/Folio/internal/widget"
 	"github.com/chromedp/chromedp"
 )
 
@@ -33,23 +33,49 @@ func NewRenderer(templatePath, outputDir string) (*Renderer, error) {
 	return &Renderer{tmpl: tmpl, outputDir: outputDir}, nil
 }
 
-// templateData adds the requested render dimensions to the weather data so
-// the template can scale fonts/spacing to the actual canvas size instead of
-// TRMNL's fixed 800x480 baseline.
-type templateData struct {
-	models.WeatherData
+// dashboardData feeds templates/dashboard.html: Width drives --folio-scale
+// (TRMNL's framework CSS is tuned for its fixed 800x480 baseline), and
+// Main/Corner are the two widget slots this milestone supports.
+type dashboardData struct {
 	Width  int
-	Height int
+	Main   template.HTML
+	Corner template.HTML
 }
 
-func (r *Renderer) Render(ctx context.Context, data models.WeatherData, width, height int) (string, error) {
-	var htmlBuf bytes.Buffer
-	if err := r.tmpl.Execute(&htmlBuf, templateData{WeatherData: data, Width: width, Height: height}); err != nil {
+// buildDashboardHTML renders each widget in order — widgets[0] into the
+// Main slot, widgets[1] (if present) into Corner — and composes the
+// dashboard shell around them. A widget that errors gets an empty
+// fragment in its slot; it never fails the whole dashboard.
+func (r *Renderer) buildDashboardHTML(ctx context.Context, widgets []widget.Widget, width int) (string, error) {
+	var fragments [2]template.HTML
+	for i, w := range widgets {
+		if i >= len(fragments) {
+			break
+		}
+		html, err := w.Render(ctx)
+		if err != nil {
+			slog.Error("widget render failed", "index", i, "error", err)
+			continue
+		}
+		fragments[i] = html
+	}
+
+	var buf bytes.Buffer
+	data := dashboardData{Width: width, Main: fragments[0], Corner: fragments[1]}
+	if err := r.tmpl.Execute(&buf, data); err != nil {
 		return "", fmt.Errorf("execute template: %w", err)
+	}
+	return buf.String(), nil
+}
+
+func (r *Renderer) RenderDashboard(ctx context.Context, widgets []widget.Widget, width, height int) (string, error) {
+	htmlStr, err := r.buildDashboardHTML(ctx, widgets, width)
+	if err != nil {
+		return "", err
 	}
 
 	htmlPath := filepath.Join(r.outputDir, "render.html")
-	if err := os.WriteFile(htmlPath, htmlBuf.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile(htmlPath, []byte(htmlStr), 0o644); err != nil {
 		return "", fmt.Errorf("write html: %w", err)
 	}
 
