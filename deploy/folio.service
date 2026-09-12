@@ -1,0 +1,13 @@
+[Unit]
+Description=TRMNL BYOS server for Kindle Paperwhite
+After=network.target
+
+[Service]
+User=gautam
+WorkingDirectory=/home/gautam/Folio
+ExecStart=/home/gautam/Folio/bin/folio
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
