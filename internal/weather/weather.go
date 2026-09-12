@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"sync"
 	"time"
@@ -40,6 +41,7 @@ func (c *Client) Get(ctx context.Context, lat, lon float64) (models.WeatherData,
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		if c.hasCache {
+			slog.Warn("open-meteo fetch failed, serving cached weather", "error", err)
 			return c.cached, nil
 		}
 		return models.WeatherData{}, err

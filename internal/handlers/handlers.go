@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Gautam-J/Folio/internal/models"
 )
@@ -61,6 +63,7 @@ func (s *Server) HandleDisplay(w http.ResponseWriter, r *http.Request) {
 
 	weatherData, err := s.weather.Get(r.Context(), s.lat, s.lon)
 	if err != nil {
+		slog.Error("weather fetch failed", "error", err)
 		writeJSON(w, http.StatusBadGateway, models.DisplayResponse{
 			Status: http.StatusBadGateway,
 			Error:  "weather unavailable",
@@ -68,8 +71,12 @@ func (s *Server) HandleDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filename, err := s.renderer.Render(r.Context(), weatherData, width, height)
+	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
+	defer cancel()
+
+	filename, err := s.renderer.Render(ctx, weatherData, width, height)
 	if err != nil {
+		slog.Error("render failed", "error", err)
 		writeJSON(w, http.StatusInternalServerError, models.DisplayResponse{
 			Status: http.StatusInternalServerError,
 			Error:  "render failed",
@@ -77,6 +84,7 @@ func (s *Server) HandleDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	slog.Info("served display request", "filename", filename)
 	writeJSON(w, http.StatusOK, models.DisplayResponse{
 		Status:      0,
 		ImageURL:    fmt.Sprintf("http://%s/images/%s", r.Host, filename),
