@@ -82,23 +82,27 @@
 </svg>{{end}}
 
 <div class="layout layout--col gap--large">
-  <div class="columns">
+  <div class="columns columns--temp">
     <div class="column">
       <span class="value value--xxlarge">{{printf "%.0f" .Temperature}}&deg;C</span>
-      <div class="weather-description-row">
-        <span class="weather-icon weather-icon--description">
-          {{if eq .Icon "clear"}}{{template "icon-sun"}}
-          {{else if eq .Icon "partly-cloudy"}}{{template "icon-partly-cloudy"}}
-          {{else if eq .Icon "cloudy"}}{{template "icon-cloud"}}
-          {{else if eq .Icon "fog"}}{{template "icon-fog"}}
-          {{else if eq .Icon "rain"}}{{template "icon-rain"}}
-          {{else if eq .Icon "snow"}}{{template "icon-snow"}}
-          {{else if eq .Icon "thunderstorm"}}{{template "icon-thunderstorm"}}
-          {{else}}{{template "icon-cloud"}}{{end}}
-        </span>
-        <span class="label weather-description">{{.Description}}</span>
-      </div>
     </div>
+    <div class="column weather-highlow">
+      <div class="weather-highlow__row">{{template "icon-up"}}<span class="label">{{printf "%.0f" .TempMax}}&deg;C</span></div>
+      <div class="weather-highlow__row">{{template "icon-down"}}<span class="label">{{printf "%.0f" .TempMin}}&deg;C</span></div>
+    </div>
+  </div>
+  <div class="weather-description-row">
+    <span class="weather-icon weather-icon--description">
+      {{if eq .Icon "clear"}}{{template "icon-sun"}}
+      {{else if eq .Icon "partly-cloudy"}}{{template "icon-partly-cloudy"}}
+      {{else if eq .Icon "cloudy"}}{{template "icon-cloud"}}
+      {{else if eq .Icon "fog"}}{{template "icon-fog"}}
+      {{else if eq .Icon "rain"}}{{template "icon-rain"}}
+      {{else if eq .Icon "snow"}}{{template "icon-snow"}}
+      {{else if eq .Icon "thunderstorm"}}{{template "icon-thunderstorm"}}
+      {{else}}{{template "icon-cloud"}}{{end}}
+    </span>
+    <span class="label weather-description">{{.Description}}</span>
   </div>
   <div class="columns columns--stat">
     <div class="column">{{template "icon-humidity"}}<span class="label">Humidity: {{.Humidity}}%</span></div>
@@ -107,10 +111,6 @@
   <div class="columns columns--stat">
     <div class="column">{{template "icon-sun"}}<span class="label">UV index: {{printf "%.1f" .UVIndex}}</span></div>
     <div class="column">{{template "icon-cloud"}}<span class="label">Cloud: {{.CloudCover}}%</span></div>
-  </div>
-  <div class="columns columns--stat">
-    <div class="column">{{template "icon-up"}}<span class="label">High: {{printf "%.0f" .TempMax}}&deg;C</span></div>
-    <div class="column">{{template "icon-down"}}<span class="label">Low: {{printf "%.0f" .TempMin}}&deg;C</span></div>
   </div>
   <div class="columns columns--stat">
     <div class="column">{{template "icon-sunrise"}}<span class="label">Sunrise: {{.Sunrise.Format "15:04"}}</span></div>
