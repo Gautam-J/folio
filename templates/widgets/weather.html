@@ -1,0 +1,53 @@
+<!-- templates/widgets/weather.html -->
+<div class="layout layout--col gap--large">
+  <div class="columns">
+    <div class="column">
+      <span class="value value--xxlarge">{{printf "%.0f" .Temperature}}&deg;C</span>
+      <span class="label">{{.Description}}</span>
+    </div>
+  </div>
+  <div class="columns columns--stat">
+    <div class="column">
+      <span class="label">Humidity: {{.Humidity}}%</span>
+    </div>
+    <div class="column">
+      <span class="label">Wind: {{printf "%.1f" .WindSpeed}} km/h</span>
+    </div>
+  </div>
+  <div class="columns columns--stat">
+    <div class="column">
+      <span class="label">High: {{printf "%.0f" .TempMax}}&deg;C</span>
+    </div>
+    <div class="column">
+      <span class="label">Low: {{printf "%.0f" .TempMin}}&deg;C</span>
+    </div>
+  </div>
+  <div class="columns columns--stat">
+    <div class="column">
+      <span class="label">Sunrise: {{.Sunrise.Format "15:04"}}</span>
+    </div>
+    <div class="column">
+      <span class="label">Sunset: {{.Sunset.Format "15:04"}}</span>
+    </div>
+  </div>
+  <div class="columns columns--stat">
+    <div class="column">
+      <span class="label">Rain chance: {{.PrecipProbability}}%</span>
+    </div>
+    <div class="column">
+      <span class="label">Gusts: {{printf "%.0f" .WindGusts}} km/h</span>
+    </div>
+  </div>
+  <div class="columns columns--stat">
+    <div class="column">
+      <span class="label">UV index: {{printf "%.1f" .UVIndex}}</span>
+    </div>
+    <div class="column">
+      <span class="label">Cloud: {{.CloudCover}}%</span>
+    </div>
+  </div>
+</div>
+<div class="title_bar">
+  <span class="title">Weather</span>
+  <span class="instance">Updated {{.FetchedAt.Format "15:04"}}</span>
+</div>
