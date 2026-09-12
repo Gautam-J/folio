@@ -25,6 +25,10 @@ type QuoteData struct {
 	Author string
 }
 
+type OnThisDayData struct {
+	Text string
+}
+
 type DisplayResponse struct {
 	Status      int    `json:"status"`
 	ImageURL    string `json:"image_url,omitempty"`

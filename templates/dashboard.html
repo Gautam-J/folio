@@ -25,6 +25,51 @@
       min-height: 0;
       padding-left: calc(16px * var(--folio-scale));
     }
+    /* Row holding the weather widget (Main) plus the on-this-day column
+       (Aside) beside it. Main gets a fixed share of the row (see below);
+       Aside grows to fill the rest. */
+    .dashboard-main-row {
+      display: flex;
+      align-items: stretch;
+      height: 100%;
+      gap: calc(32px * var(--folio-scale));
+    }
+    /* TRMNL's .column{width:0;flex:1} and .columns{width:100%} both need a
+       definite width on every ancestor up to .layout. A flex item sized by
+       flex-basis:auto (content-based) never produces one — the whole chain
+       resolves to 0. A percentage flex-basis is definite (resolves against
+       the row's own definite width), so give weather a fixed share of the
+       row instead of auto/content sizing. align-items:stretch (above) gives
+       both columns a definite height too, which .layout{height:100%} below
+       needs for the same reason. */
+    .dashboard-main-row > .layout {
+      flex: 0 0 58%;
+    }
+    .dashboard-aside {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding-top: calc(4px * var(--folio-scale));
+    }
+    /* TRMNL's .layout centers its children both ways by default (see the
+       framework .layout rule further down) — weather's own content only
+       looks top/left-anchored because it nearly fills the column. Override
+       explicitly so on-this-day's position is predictable. */
+    .dashboard-aside .layout {
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    .label.onthisday-heading {
+      display: block;
+      font-size: calc(28px * var(--folio-scale));
+      /* Lines up with weather's "Overcast" row, measured against weather's
+         temp block height so both sit at the same y across the row. */
+      margin-top: calc(186px * var(--folio-scale));
+    }
+    .label.onthisday-text {
+      display: block;
+      font-size: calc(16px * var(--folio-scale));
+      line-height: calc(20px * var(--folio-scale));
+    }
     /* TRMNL's framework pins .layout to a fixed 800x480 box (via --screen-w/
        --screen-h) regardless of the .screen/.view overrides above. Left in
        place, it clips/overflows once fonts are scaled up for larger canvases. */
@@ -170,7 +215,10 @@
   <div class="screen">
     <div class="view view--full">
       <div class="dashboard-main">
-        {{.Main}}
+        <div class="dashboard-main-row">
+          {{.Main}}
+          <div class="dashboard-aside">{{.Aside}}</div>
+        </div>
         <div class="dashboard-corner">{{.Corner}}</div>
       </div>
       <div class="dashboard-footer">

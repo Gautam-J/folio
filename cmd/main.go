@@ -11,6 +11,7 @@ import (
 
 	"github.com/Gautam-J/Folio/internal/config"
 	"github.com/Gautam-J/Folio/internal/handlers"
+	"github.com/Gautam-J/Folio/internal/onthisday"
 	"github.com/Gautam-J/Folio/internal/quote"
 	"github.com/Gautam-J/Folio/internal/render"
 	"github.com/Gautam-J/Folio/internal/weather"
@@ -59,7 +60,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	widgets := []widget.Widget{weatherWidget, dateTimeWidget, quoteWidget, progressWidget}
+	onThisDayClient := onthisday.NewClient(onthisday.DefaultBaseURL)
+
+	onThisDayWidget, err := widget.NewOnThisDayWidget(onThisDayClient, "templates/widgets/onthisday.html")
+	if err != nil {
+		slog.Error("failed to init on-this-day widget", "error", err)
+		os.Exit(1)
+	}
+
+	widgets := []widget.Widget{weatherWidget, dateTimeWidget, quoteWidget, progressWidget, onThisDayWidget}
 
 	renderer, err := render.NewRenderer("templates/dashboard.html", outputDir)
 	if err != nil {

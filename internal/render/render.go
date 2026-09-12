@@ -36,7 +36,8 @@ func NewRenderer(templatePath, outputDir string) (*Renderer, error) {
 
 // dashboardData feeds templates/dashboard.html: Width drives --folio-scale
 // (TRMNL's framework CSS is tuned for its fixed 800x480 baseline), and
-// Main/Corner/Strip/Bottom are the four widget slots this milestone supports.
+// Main/Corner/Strip/Bottom/Aside are the five widget slots this milestone
+// supports.
 type dashboardData struct {
 	Width  int
 	Now    time.Time
@@ -44,15 +45,16 @@ type dashboardData struct {
 	Corner template.HTML
 	Strip  template.HTML
 	Bottom template.HTML
+	Aside  template.HTML
 }
 
 // buildDashboardHTML renders each widget in order — widgets[0] into Main,
 // widgets[1] (if present) into Corner, widgets[2] (if present) into Strip,
-// widgets[3] (if present) into Bottom — and composes the dashboard shell
-// around them. A widget that errors gets an empty fragment in its slot; it
-// never fails the whole dashboard.
+// widgets[3] (if present) into Bottom, widgets[4] (if present) into Aside —
+// and composes the dashboard shell around them. A widget that errors gets
+// an empty fragment in its slot; it never fails the whole dashboard.
 func (r *Renderer) buildDashboardHTML(ctx context.Context, widgets []widget.Widget, width int) (string, error) {
-	var fragments [4]template.HTML
+	var fragments [5]template.HTML
 	for i, w := range widgets {
 		if i >= len(fragments) {
 			break
@@ -66,7 +68,7 @@ func (r *Renderer) buildDashboardHTML(ctx context.Context, widgets []widget.Widg
 	}
 
 	var buf bytes.Buffer
-	data := dashboardData{Width: width, Now: time.Now(), Main: fragments[0], Corner: fragments[1], Strip: fragments[2], Bottom: fragments[3]}
+	data := dashboardData{Width: width, Now: time.Now(), Main: fragments[0], Corner: fragments[1], Strip: fragments[2], Bottom: fragments[3], Aside: fragments[4]}
 	if err := r.tmpl.Execute(&buf, data); err != nil {
 		return "", fmt.Errorf("execute template: %w", err)
 	}
