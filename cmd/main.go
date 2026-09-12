@@ -11,6 +11,7 @@ import (
 
 	"github.com/Gautam-J/Folio/internal/config"
 	"github.com/Gautam-J/Folio/internal/handlers"
+	"github.com/Gautam-J/Folio/internal/quote"
 	"github.com/Gautam-J/Folio/internal/render"
 	"github.com/Gautam-J/Folio/internal/weather"
 	"github.com/Gautam-J/Folio/internal/widget"
@@ -44,13 +45,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	quoteClient := quote.NewClient(quote.DefaultBaseURL)
+
+	quoteWidget, err := widget.NewQuoteWidget(quoteClient, "templates/widgets/quote.html")
+	if err != nil {
+		slog.Error("failed to init quote widget", "error", err)
+		os.Exit(1)
+	}
+
 	progressWidget, err := widget.NewProgressWidget("templates/widgets/progress.html", time.Now)
 	if err != nil {
 		slog.Error("failed to init progress widget", "error", err)
 		os.Exit(1)
 	}
 
-	widgets := []widget.Widget{weatherWidget, dateTimeWidget, progressWidget}
+	widgets := []widget.Widget{weatherWidget, dateTimeWidget, quoteWidget, progressWidget}
 
 	renderer, err := render.NewRenderer("templates/dashboard.html", outputDir)
 	if err != nil {

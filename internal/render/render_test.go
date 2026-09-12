@@ -20,6 +20,12 @@ func (f fakeWeatherFetcher) Get(ctx context.Context, lat, lon float64) (models.W
 	return f.data, nil
 }
 
+type fakeQuoteFetcher struct{ data models.QuoteData }
+
+func (f fakeQuoteFetcher) Get(ctx context.Context) (models.QuoteData, error) {
+	return f.data, nil
+}
+
 func TestRenderDashboard_ProducesPNGAtRequestedSize(t *testing.T) {
 	dir := t.TempDir()
 	r, err := NewRenderer("../../templates/dashboard.html", dir)
@@ -47,6 +53,14 @@ func TestRenderDashboard_ProducesPNGAtRequestedSize(t *testing.T) {
 		t.Fatalf("NewDateTimeWidget: %v", err)
 	}
 
+	quoteWidget, err := widget.NewQuoteWidget(
+		fakeQuoteFetcher{data: models.QuoteData{Quote: "Stay hungry, stay foolish.", Author: "Steve Jobs"}},
+		"../../templates/widgets/quote.html",
+	)
+	if err != nil {
+		t.Fatalf("NewQuoteWidget: %v", err)
+	}
+
 	progressWidget, err := widget.NewProgressWidget("../../templates/widgets/progress.html", time.Now)
 	if err != nil {
 		t.Fatalf("NewProgressWidget: %v", err)
@@ -55,7 +69,7 @@ func TestRenderDashboard_ProducesPNGAtRequestedSize(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	filename, err := r.RenderDashboard(ctx, []widget.Widget{weatherWidget, dateTimeWidget, progressWidget}, 1072, 1448)
+	filename, err := r.RenderDashboard(ctx, []widget.Widget{weatherWidget, dateTimeWidget, quoteWidget, progressWidget}, 1072, 1448)
 	if err != nil {
 		t.Fatalf("RenderDashboard: %v", err)
 	}

@@ -25,7 +25,7 @@ func (s stubWidget) Render(ctx context.Context) (template.HTML, error) {
 func TestBuildDashboardHTML_ComposesWidgetsAndIsolatesErrors(t *testing.T) {
 	dir := t.TempDir()
 	tmplPath := filepath.Join(dir, "dashboard.html")
-	tmplContent := `<div id="main">{{.Main}}</div><div id="corner">{{.Corner}}</div><div id="bottom">{{.Bottom}}</div>`
+	tmplContent := `<div id="main">{{.Main}}</div><div id="corner">{{.Corner}}</div><div id="strip">{{.Strip}}</div><div id="bottom">{{.Bottom}}</div>`
 	if err := os.WriteFile(tmplPath, []byte(tmplContent), 0o644); err != nil {
 		t.Fatalf("write template: %v", err)
 	}
@@ -38,6 +38,7 @@ func TestBuildDashboardHTML_ComposesWidgetsAndIsolatesErrors(t *testing.T) {
 	widgets := []widget.Widget{
 		stubWidget{html: template.HTML("<p>weather</p>")},
 		stubWidget{err: errors.New("boom")},
+		stubWidget{html: template.HTML("<p>quote</p>")},
 		stubWidget{html: template.HTML("<p>progress</p>")},
 	}
 
@@ -54,6 +55,9 @@ func TestBuildDashboardHTML_ComposesWidgetsAndIsolatesErrors(t *testing.T) {
 	if !strings.Contains(got, `<div id="corner"></div>`) {
 		t.Errorf("expected empty corner slot for the erroring widget, got: %s", got)
 	}
+	if !strings.Contains(got, "<p>quote</p>") {
+		t.Errorf("expected strip slot's fragment in output, got: %s", got)
+	}
 	if !strings.Contains(got, "<p>progress</p>") {
 		t.Errorf("expected bottom slot's fragment in output, got: %s", got)
 	}
@@ -62,7 +66,7 @@ func TestBuildDashboardHTML_ComposesWidgetsAndIsolatesErrors(t *testing.T) {
 func TestBuildDashboardHTML_FewerWidgetsThanSlotsLeavesRestEmpty(t *testing.T) {
 	dir := t.TempDir()
 	tmplPath := filepath.Join(dir, "dashboard.html")
-	tmplContent := `<div id="main">{{.Main}}</div><div id="corner">{{.Corner}}</div><div id="bottom">{{.Bottom}}</div>`
+	tmplContent := `<div id="main">{{.Main}}</div><div id="corner">{{.Corner}}</div><div id="strip">{{.Strip}}</div><div id="bottom">{{.Bottom}}</div>`
 	if err := os.WriteFile(tmplPath, []byte(tmplContent), 0o644); err != nil {
 		t.Fatalf("write template: %v", err)
 	}
@@ -78,7 +82,7 @@ func TestBuildDashboardHTML_FewerWidgetsThanSlotsLeavesRestEmpty(t *testing.T) {
 	if err != nil {
 		t.Fatalf("buildDashboardHTML: %v", err)
 	}
-	if !strings.Contains(got, `<div id="corner"></div>`) || !strings.Contains(got, `<div id="bottom"></div>`) {
-		t.Errorf("expected empty corner and bottom slots when only one widget given, got: %s", got)
+	if !strings.Contains(got, `<div id="corner"></div>`) || !strings.Contains(got, `<div id="strip"></div>`) || !strings.Contains(got, `<div id="bottom"></div>`) {
+		t.Errorf("expected empty corner, strip, and bottom slots when only one widget given, got: %s", got)
 	}
 }

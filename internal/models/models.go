@@ -18,6 +18,11 @@ type WeatherData struct {
 	CloudCover        int
 }
 
+type QuoteData struct {
+	Quote  string
+	Author string
+}
+
 type DisplayResponse struct {
 	Status      int    `json:"status"`
 	ImageURL    string `json:"image_url,omitempty"`

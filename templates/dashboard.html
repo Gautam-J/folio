@@ -7,6 +7,23 @@
   <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #fff; }
     .screen, .view { width: 100% !important; height: 100% !important; }
+    /* Stack the main content area above the footer as two flex items rather
+       than absolutely positioning the footer over the document flow — that
+       guarantees they never overlap regardless of how tall the weather
+       widget's content gets, instead of relying on a hand-tuned offset. */
+    .view {
+      display: flex !important;
+      flex-direction: column;
+    }
+    /* flex: 1 1 auto gives .dashboard-main a definite height (all space the
+       footer doesn't need) rather than an auto/indefinite one — without
+       that, the weather widget's `.layout { height: 100% }` below resolves
+       against an indefinite parent height and collapses to zero. */
+    .dashboard-main {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
     /* TRMNL's framework pins .layout to a fixed 800x480 box (via --screen-w/
        --screen-h) regardless of the .screen/.view overrides above. Left in
        place, it clips/overflows once fonts are scaled up for larger canvases. */
@@ -32,11 +49,18 @@
       right: calc(16px * var(--folio-scale));
       text-align: right;
     }
-    .dashboard-bottom {
-      position: absolute;
-      left: calc(16px * var(--folio-scale));
-      right: calc(16px * var(--folio-scale));
-      bottom: calc(16px * var(--folio-scale));
+    /* Strip (quote) and Bottom (progress bars) stack in a flex column,
+       Strip above Bottom, as the second flex item in .view — pinned to the
+       screen's bottom edge by .view's own space-between, not by an
+       absolute offset. */
+    .dashboard-footer {
+      display: flex;
+      flex-direction: column;
+      gap: calc(12px * var(--folio-scale));
+      padding: 0 calc(16px * var(--folio-scale)) calc(16px * var(--folio-scale));
+    }
+    .dashboard-strip {
+      text-align: center;
     }
     .dashboard-progress__row {
       display: flex;
@@ -67,9 +91,14 @@
 <body class="environment trmnl">
   <div class="screen">
     <div class="view view--full">
-      {{.Main}}
-      <div class="dashboard-corner">{{.Corner}}</div>
-      <div class="dashboard-bottom">{{.Bottom}}</div>
+      <div class="dashboard-main">
+        {{.Main}}
+        <div class="dashboard-corner">{{.Corner}}</div>
+      </div>
+      <div class="dashboard-footer">
+        <div class="dashboard-strip">{{.Strip}}</div>
+        <div class="dashboard-bottom">{{.Bottom}}</div>
+      </div>
     </div>
   </div>
 </body>
