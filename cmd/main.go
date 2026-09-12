@@ -44,7 +44,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	widgets := []widget.Widget{weatherWidget, dateTimeWidget}
+	progressWidget, err := widget.NewProgressWidget("templates/widgets/progress.html", time.Now)
+	if err != nil {
+		slog.Error("failed to init progress widget", "error", err)
+		os.Exit(1)
+	}
+
+	widgets := []widget.Widget{weatherWidget, dateTimeWidget, progressWidget}
 
 	renderer, err := render.NewRenderer("templates/dashboard.html", outputDir)
 	if err != nil {

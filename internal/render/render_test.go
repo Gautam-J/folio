@@ -47,10 +47,15 @@ func TestRenderDashboard_ProducesPNGAtRequestedSize(t *testing.T) {
 		t.Fatalf("NewDateTimeWidget: %v", err)
 	}
 
+	progressWidget, err := widget.NewProgressWidget("../../templates/widgets/progress.html", time.Now)
+	if err != nil {
+		t.Fatalf("NewProgressWidget: %v", err)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	filename, err := r.RenderDashboard(ctx, []widget.Widget{weatherWidget, dateTimeWidget}, 1072, 1448)
+	filename, err := r.RenderDashboard(ctx, []widget.Widget{weatherWidget, dateTimeWidget, progressWidget}, 1072, 1448)
 	if err != nil {
 		t.Fatalf("RenderDashboard: %v", err)
 	}

@@ -29,6 +29,36 @@
       right: calc(16px * var(--folio-scale));
       text-align: right;
     }
+    .dashboard-bottom {
+      position: absolute;
+      left: calc(16px * var(--folio-scale));
+      right: calc(16px * var(--folio-scale));
+      bottom: calc(16px * var(--folio-scale));
+    }
+    .dashboard-progress__row {
+      display: flex;
+      align-items: center;
+      gap: calc(8px * var(--folio-scale));
+      margin-top: calc(6px * var(--folio-scale));
+    }
+    .dashboard-progress__row .label {
+      flex: none;
+      width: calc(60px * var(--folio-scale));
+    }
+    .dashboard-progress__row .label:last-child {
+      text-align: right;
+    }
+    .dashboard-progress__track {
+      flex: 1;
+      height: calc(10px * var(--folio-scale));
+      background: #ddd;
+      border-radius: calc(5px * var(--folio-scale));
+      overflow: hidden;
+    }
+    .dashboard-progress__fill {
+      height: 100%;
+      background: #000;
+    }
   </style>
 </head>
 <body class="environment trmnl">
@@ -36,6 +66,7 @@
     <div class="view view--full">
       {{.Main}}
       <div class="dashboard-corner">{{.Corner}}</div>
+      <div class="dashboard-bottom">{{.Bottom}}</div>
     </div>
   </div>
 </body>

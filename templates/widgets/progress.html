@@ -1,0 +1,18 @@
+<!-- templates/widgets/progress.html -->
+<div class="dashboard-progress">
+  <div class="dashboard-progress__row">
+    <span class="label">Week</span>
+    <div class="dashboard-progress__track"><div class="dashboard-progress__fill" style="width: {{.Week}}%"></div></div>
+    <span class="label">{{.Week}}%</span>
+  </div>
+  <div class="dashboard-progress__row">
+    <span class="label">Month</span>
+    <div class="dashboard-progress__track"><div class="dashboard-progress__fill" style="width: {{.Month}}%"></div></div>
+    <span class="label">{{.Month}}%</span>
+  </div>
+  <div class="dashboard-progress__row">
+    <span class="label">Year</span>
+    <div class="dashboard-progress__track"><div class="dashboard-progress__fill" style="width: {{.Year}}%"></div></div>
+    <span class="label">{{.Year}}%</span>
+  </div>
+</div>
