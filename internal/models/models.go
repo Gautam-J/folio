@@ -3,11 +3,19 @@ package models
 import "time"
 
 type WeatherData struct {
-	Temperature float64
-	Humidity    int
-	WindSpeed   float64
-	Description string
-	FetchedAt   time.Time
+	Temperature       float64
+	Humidity          int
+	WindSpeed         float64
+	Description       string
+	FetchedAt         time.Time
+	TempMin           float64
+	TempMax           float64
+	Sunrise           time.Time
+	Sunset            time.Time
+	PrecipProbability int
+	WindGusts         float64
+	UVIndex           float64
+	CloudCover        int
 }
 
 type DisplayResponse struct {

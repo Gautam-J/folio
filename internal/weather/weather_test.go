@@ -5,12 +5,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestGet_Success(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"current":{"temperature_2m":21.5,"relative_humidity_2m":55,"weather_code":3,"wind_speed_10m":4.2}}`))
+		w.Write([]byte(`{
+			"current":{"temperature_2m":21.5,"relative_humidity_2m":55,"weather_code":3,"wind_speed_10m":4.2,"uv_index":1.5,"cloud_cover":98},
+			"daily":{"temperature_2m_min":[15.0],"temperature_2m_max":[25.0],"sunrise":["2026-09-12T06:21"],"sunset":["2026-09-12T18:39"],"precipitation_probability_max":[90],"wind_gusts_10m_max":[47.0]}
+		}`))
 	}))
 	defer srv.Close()
 
@@ -30,6 +34,32 @@ func TestGet_Success(t *testing.T) {
 	}
 	if data.Description != "Overcast" {
 		t.Errorf("Description = %q, want %q", data.Description, "Overcast")
+	}
+	if data.TempMin != 15.0 {
+		t.Errorf("TempMin = %v, want 15.0", data.TempMin)
+	}
+	if data.TempMax != 25.0 {
+		t.Errorf("TempMax = %v, want 25.0", data.TempMax)
+	}
+	wantSunrise := time.Date(2026, 9, 12, 6, 21, 0, 0, time.UTC)
+	if !data.Sunrise.Equal(wantSunrise) {
+		t.Errorf("Sunrise = %v, want %v", data.Sunrise, wantSunrise)
+	}
+	wantSunset := time.Date(2026, 9, 12, 18, 39, 0, 0, time.UTC)
+	if !data.Sunset.Equal(wantSunset) {
+		t.Errorf("Sunset = %v, want %v", data.Sunset, wantSunset)
+	}
+	if data.PrecipProbability != 90 {
+		t.Errorf("PrecipProbability = %v, want 90", data.PrecipProbability)
+	}
+	if data.WindGusts != 47.0 {
+		t.Errorf("WindGusts = %v, want 47.0", data.WindGusts)
+	}
+	if data.UVIndex != 1.5 {
+		t.Errorf("UVIndex = %v, want 1.5", data.UVIndex)
+	}
+	if data.CloudCover != 98 {
+		t.Errorf("CloudCover = %v, want 98", data.CloudCover)
 	}
 }
 

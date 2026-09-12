@@ -32,7 +32,10 @@ func NewClient(baseURL string) *Client {
 
 func (c *Client) Get(ctx context.Context, lat, lon float64) (models.WeatherData, error) {
 	url := fmt.Sprintf(
-		"%s?latitude=%g&longitude=%g&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
+		"%s?latitude=%g&longitude=%g"+
+			"&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,uv_index,cloud_cover"+
+			"&daily=temperature_2m_min,temperature_2m_max,sunrise,sunset,precipitation_probability_max,wind_gusts_10m_max"+
+			"&timezone=auto",
 		c.baseURL, lat, lon,
 	)
 
@@ -61,7 +64,46 @@ type openMeteoResponse struct {
 		RelativeHumidity int     `json:"relative_humidity_2m"`
 		WeatherCode      int     `json:"weather_code"`
 		WindSpeed        float64 `json:"wind_speed_10m"`
+		UVIndex          float64 `json:"uv_index"`
+		CloudCover       int     `json:"cloud_cover"`
 	} `json:"current"`
+	Daily struct {
+		TempMin              []float64 `json:"temperature_2m_min"`
+		TempMax              []float64 `json:"temperature_2m_max"`
+		Sunrise              []string  `json:"sunrise"`
+		Sunset               []string  `json:"sunset"`
+		PrecipProbabilityMax []int     `json:"precipitation_probability_max"`
+		WindGustsMax         []float64 `json:"wind_gusts_10m_max"`
+	} `json:"daily"`
+}
+
+// dailyTimeLayout matches Open-Meteo's iso8601 sunrise/sunset format when
+// timezone=auto is set: a local timestamp with no offset, e.g. "2026-09-12T06:21".
+const dailyTimeLayout = "2006-01-02T15:04"
+
+func firstFloat(vals []float64) float64 {
+	if len(vals) == 0 {
+		return 0
+	}
+	return vals[0]
+}
+
+func firstInt(vals []int) int {
+	if len(vals) == 0 {
+		return 0
+	}
+	return vals[0]
+}
+
+func firstTime(vals []string) time.Time {
+	if len(vals) == 0 {
+		return time.Time{}
+	}
+	t, err := time.Parse(dailyTimeLayout, vals[0])
+	if err != nil {
+		return time.Time{}
+	}
+	return t
 }
 
 func (c *Client) fetch(ctx context.Context, url string) (models.WeatherData, error) {
@@ -86,11 +128,19 @@ func (c *Client) fetch(ctx context.Context, url string) (models.WeatherData, err
 	}
 
 	return models.WeatherData{
-		Temperature: parsed.Current.Temperature,
-		Humidity:    parsed.Current.RelativeHumidity,
-		WindSpeed:   parsed.Current.WindSpeed,
-		Description: describeCode(parsed.Current.WeatherCode),
-		FetchedAt:   time.Now(),
+		Temperature:       parsed.Current.Temperature,
+		Humidity:          parsed.Current.RelativeHumidity,
+		WindSpeed:         parsed.Current.WindSpeed,
+		Description:       describeCode(parsed.Current.WeatherCode),
+		FetchedAt:         time.Now(),
+		TempMin:           firstFloat(parsed.Daily.TempMin),
+		TempMax:           firstFloat(parsed.Daily.TempMax),
+		Sunrise:           firstTime(parsed.Daily.Sunrise),
+		Sunset:            firstTime(parsed.Daily.Sunset),
+		PrecipProbability: firstInt(parsed.Daily.PrecipProbabilityMax),
+		WindGusts:         firstFloat(parsed.Daily.WindGustsMax),
+		UVIndex:           parsed.Current.UVIndex,
+		CloudCover:        parsed.Current.CloudCover,
 	}, nil
 }
 
