@@ -1,0 +1,7 @@
+# config.example.yaml
+# Copy to config.yaml and fill in real values before running.
+access_token: "changeme"
+port: 8080
+latitude: 0.0
+longitude: 0.0
+refresh_rate_seconds: 1800
