@@ -105,6 +105,10 @@
     <div class="column">{{template "icon-wind"}}<span class="label">Wind: {{printf "%.1f" .WindSpeed}} km/h</span></div>
   </div>
   <div class="columns columns--stat">
+    <div class="column">{{template "icon-sun"}}<span class="label">UV index: {{printf "%.1f" .UVIndex}}</span></div>
+    <div class="column">{{template "icon-cloud"}}<span class="label">Cloud: {{.CloudCover}}%</span></div>
+  </div>
+  <div class="columns columns--stat">
     <div class="column">{{template "icon-up"}}<span class="label">High: {{printf "%.0f" .TempMax}}&deg;C</span></div>
     <div class="column">{{template "icon-down"}}<span class="label">Low: {{printf "%.0f" .TempMin}}&deg;C</span></div>
   </div>
@@ -115,9 +119,5 @@
   <div class="columns columns--stat">
     <div class="column">{{template "icon-rain"}}<span class="label">Rain chance: {{.PrecipProbability}}%</span></div>
     <div class="column">{{template "icon-wind"}}<span class="label">Gusts: {{printf "%.0f" .WindGusts}} km/h</span></div>
-  </div>
-  <div class="columns columns--stat">
-    <div class="column">{{template "icon-sun"}}<span class="label">UV index: {{printf "%.1f" .UVIndex}}</span></div>
-    <div class="column">{{template "icon-cloud"}}<span class="label">Cloud: {{.CloudCover}}%</span></div>
   </div>
 </div>
