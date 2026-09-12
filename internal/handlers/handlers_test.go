@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/Gautam-J/Folio/internal/models"
@@ -64,8 +65,11 @@ func TestHandleDisplay_Success(t *testing.T) {
 	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
 		t.Fatalf("decode response: %v", err)
 	}
-	if resp.Filename != "current.png" {
-		t.Errorf("Filename = %q, want %q", resp.Filename, "current.png")
+	if !strings.HasPrefix(resp.Filename, "current-") || !strings.HasSuffix(resp.Filename, ".png") {
+		t.Errorf("Filename = %q, want a cache-busting name like %q", resp.Filename, "current-<timestamp>.png")
+	}
+	if !strings.HasSuffix(resp.ImageURL, "/images/current.png") {
+		t.Errorf("ImageURL = %q, want it to end with %q", resp.ImageURL, "/images/current.png")
 	}
 	if resp.RefreshRate != 1800 {
 		t.Errorf("RefreshRate = %d, want 1800", resp.RefreshRate)

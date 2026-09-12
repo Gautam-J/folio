@@ -84,11 +84,17 @@ func (s *Server) HandleDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// The plugin invalidates its local image cache purely by comparing this
+	// field to the last response's — not by content or HTTP headers — so it
+	// must change on every render even though the served file is always
+	// overwritten in place at the same URL.
+	cacheBustFilename := fmt.Sprintf("current-%d.png", time.Now().Unix())
+
 	slog.Info("served display request", "filename", filename)
 	writeJSON(w, http.StatusOK, models.DisplayResponse{
 		Status:      0,
 		ImageURL:    fmt.Sprintf("http://%s/images/%s", r.Host, filename),
-		Filename:    filename,
+		Filename:    cacheBustFilename,
 		RefreshRate: s.refreshRate,
 	})
 }
