@@ -30,18 +30,18 @@ Request flow through `cmd/main.go`'s wiring:
 ```
 GET /api/display (access-token, png-width, png-height headers)
   → handlers.Server.HandleDisplay
-      → build []widget.Widget{weatherWidget, dateTimeWidget}  — constructed once at startup in cmd/main.go
+      → build []widget.Widget{weatherWidget, dateTimeWidget, progressWidget}  — constructed once at startup in cmd/main.go
       → render.Renderer.RenderDashboard(ctx, widgets, w, h)   — internal/render
           → each widget's own Render(ctx) (template.HTML, error) (weather's calls weather.Client.Get internally)
-          → composes the fragments into templates/dashboard.html
+          → composes the fragments into templates/dashboard.html's Main/Corner/Bottom slots
   → JSON { image_url, filename, refresh_rate, ... }
 GET /images/* → handlers.Server.ImagesHandler (serves generated/ as a static dir)
 ```
 
 - **`internal/handlers`** — the only HTTP-facing package. `Server` depends on `[]widget.Widget` and a `DashboardRenderer` interface (`RenderDashboard(ctx, widgets, width, height) (string, error)`), so tests stub both (see `handlers_test.go`) instead of hitting the network or a real browser.
-- **`internal/widget`** — the `Widget` interface (`Render(ctx context.Context) (template.HTML, error)`) plus `WeatherWidget` and `DateTimeWidget`, its two implementations. Each widget owns both its own data fetch and its own template, so `internal/render` and `internal/handlers` don't need to know a widget's internal data shape — adding a future widget means adding a type here, not touching the render/handler plumbing.
+- **`internal/widget`** — the `Widget` interface (`Render(ctx context.Context) (template.HTML, error)`) plus `WeatherWidget`, `DateTimeWidget`, and `ProgressWidget` (week/month/year progress bars), its three implementations. Each widget owns both its own data fetch and its own template, so `internal/render` and `internal/handlers` don't need to know a widget's internal data shape — adding a future widget means adding a type here, not touching the render/handler plumbing. The date/time widget also renders an "Updated HH:MM" line — this used to be a TRMNL `title_bar` on the weather widget, moved here since it's really a render-time value shared across all widgets, not weather-specific data.
 - **`internal/weather`** — Open-Meteo client (no API key). Caches the last successful result in memory and serves it on fetch failure rather than erroring, so a transient network blip doesn't break a render.
-- **`internal/render`** — `RenderDashboard` calls each widget's `Render` to get an HTML fragment, executes `templates/dashboard.html` as a Go template with those fragments, writes it to `generated/render.html`, then drives headless Chromium via `chromedp` (pinned to v0.10.0 — see Gotchas) to screenshot it at the requested `png-width`/`png-height` into `generated/current.png`.
+- **`internal/render`** — `RenderDashboard` calls each widget's `Render` to get an HTML fragment, slots them positionally into three fixed regions (widgets[0] → Main, widgets[1] → Corner, widgets[2] → Bottom), executes `templates/dashboard.html` as a Go template with those fragments, writes it to `generated/render.html`, then drives headless Chromium via `chromedp` (pinned to v0.10.0 — see Gotchas) to screenshot it at the requested `png-width`/`png-height` into `generated/current.png`.
 - **`internal/config`** — loads and validates `config.yaml` (real file is gitignored; copy from `config.example.yaml`). Fails fast if `access_token`, `port`, or `refresh_rate_seconds` are missing/invalid.
 - **`internal/models`** — shared structs (`WeatherData`, `DisplayResponse`) with the JSON tags the TRMNL protocol expects.
 
@@ -61,4 +61,4 @@ Deployed as a systemd service on a Raspberry Pi (`deploy/folio.service`) — see
 
 ## Scope
 
-Current scope is a multi-widget dashboard (weather + date/time) via the `internal/widget` framework, LAN-only, single shared-token auth. `docs/superpowers/specs/2026-09-12-dashboard-mashup-design.md` and the matching plan in `docs/superpowers/plans/` are the design/implementation docs this framework was built from; its "Future work" section is the current list of what's still deferred — GitHub stats, daily quotes, mental models, word of the day, and RSS tech news widgets, plus remote (non-LAN) access.
+Current scope is a multi-widget dashboard (weather, date/time, progress) via the `internal/widget` framework, LAN-only, single shared-token auth. `docs/superpowers/specs/2026-09-12-dashboard-mashup-design.md` and the matching plan in `docs/superpowers/plans/` are the design/implementation docs this framework was built from; its "Future work" section is the current list of what's still deferred — GitHub stats, daily quotes, mental models, word of the day, and RSS tech news widgets.
