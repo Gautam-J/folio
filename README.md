@@ -2,7 +2,7 @@
 
 A self-hosted TRMNL-compatible server that renders a weather dashboard for a Kindle Paperwhite running [KOReader](https://koreader.rocks/) with the [trmnl-koreader](https://github.com/usetrmnl/trmnl-koreader) plugin.
 
-Folio speaks TRMNL's [BYOD/BYOS](https://docs.trmnl.com/go/diy/byod-s) protocol: the Kindle polls a single HTTP endpoint on a timer, Folio renders a dashboard of widgets (weather, a date/time panel, a random quote, and week/month/year progress bars, using [TRMNL's own framework CSS](https://trmnl.com/framework)) to a PNG via headless Chromium, and hands back a JSON response pointing at the image.
+Folio speaks TRMNL's [BYOD/BYOS](https://docs.trmnl.com/go/diy/byod-s) protocol: the Kindle polls a single HTTP endpoint on a timer, Folio renders a dashboard of widgets (weather, a date/time panel, a random quote, week/month/year progress bars, and an on-this-day historical event, using [TRMNL's own framework CSS](https://trmnl.com/framework)) to a PNG via headless Chromium, and hands back a JSON response pointing at the image.
 
 ## How it works
 
@@ -98,9 +98,10 @@ make clean             # remove bin/ and generated/
 
 - `cmd/main.go` — entry point, wiring, HTTP server
 - `internal/config` — YAML config loading and validation
-- `internal/widget` — the `Widget` interface and its implementations (`WeatherWidget`, `DateTimeWidget`, `QuoteWidget`, `ProgressWidget`); each owns its own data fetch and template
+- `internal/widget` — the `Widget` interface and its implementations (`WeatherWidget`, `DateTimeWidget`, `QuoteWidget`, `ProgressWidget`, `OnThisDayWidget`); each owns its own data fetch and template
 - `internal/weather` — Open-Meteo client
 - `internal/quote` — ZenQuotes client
+- `internal/onthisday` — ZenQuotes on-this-day client
 - `internal/render` — composes widget fragments into the dashboard and renders it to a PNG via chromedp
 - `internal/handlers` — the `/api/display` and `/images/` HTTP handlers
 - `templates/dashboard.html` — the dashboard shell template; `templates/widgets/` — the per-widget fragment templates
@@ -108,7 +109,7 @@ make clean             # remove bin/ and generated/
 
 ## Scope
 
-Current scope is a multi-widget dashboard (weather, date/time, a random quote, and week/month/year progress bars), LAN-only, with a shared-token auth model. GitHub stats and RSS tech news widgets are potential future directions — see `docs/superpowers/specs/2026-09-12-dashboard-mashup-design.md`'s "Future work" section — not yet built. Two more ZenQuotes-backed widgets are also on the list: "On this day" (`today.zenquotes.io/api`) and an inspirational image (`zenquotes.io/api/image`). An xkcd comic widget (`https://xkcd.com/<random_number>/info.0.json`, returns an image) is on the list too.
+Current scope is a multi-widget dashboard (weather, date/time, a random quote, week/month/year progress bars, and an on-this-day historical event), LAN-only, with a shared-token auth model. GitHub stats and RSS tech news widgets are potential future directions — see `docs/superpowers/specs/2026-09-12-dashboard-mashup-design.md`'s "Future work" section — not yet built. A ZenQuotes-backed inspirational image widget (`zenquotes.io/api/image`) is also on the list, along with an xkcd comic widget (`https://xkcd.com/<random_number>/info.0.json`, returns an image).
 
 ## License
 
