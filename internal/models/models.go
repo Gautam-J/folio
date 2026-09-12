@@ -17,6 +17,7 @@ type WeatherData struct {
 	WindGusts         float64
 	UVIndex           float64
 	CloudCover        int
+	ApparentTemp      float64
 }
 
 type QuoteData struct {

@@ -47,7 +47,13 @@
        next to the big number rather than centered against the taller
        column (which also has the description row below the temp). */
     .columns--temp { align-items: center; justify-content: flex-start; gap: calc(12px * var(--folio-scale)); }
-    .columns--temp .weather-temp-value { flex: none; width: auto; }
+    .columns--temp .weather-temp-value {
+      flex: none;
+      width: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
     /* Shared halftone dot pattern (quote background, temp sidebar) — a
        radial-gradient grid rather than an image, so it scales cleanly with
        --folio-scale and needs no asset. */
@@ -60,6 +66,10 @@
       width: calc(16px * var(--folio-scale));
       align-self: stretch;
       flex-shrink: 0;
+    }
+    .weather-feels {
+      font-size: calc(14px * var(--folio-scale));
+      white-space: nowrap;
     }
     .weather-highlow { margin-left: calc(12px * var(--folio-scale)); }
     .weather-highlow {

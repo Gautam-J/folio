@@ -12,7 +12,7 @@ func TestGet_Success(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{
-			"current":{"temperature_2m":21.5,"relative_humidity_2m":55,"weather_code":3,"wind_speed_10m":4.2,"uv_index":1.5,"cloud_cover":98},
+			"current":{"temperature_2m":21.5,"relative_humidity_2m":55,"weather_code":3,"wind_speed_10m":4.2,"uv_index":1.5,"cloud_cover":98,"apparent_temperature":19.8},
 			"daily":{"temperature_2m_min":[15.0],"temperature_2m_max":[25.0],"sunrise":["2026-09-12T06:21"],"sunset":["2026-09-12T18:39"],"precipitation_probability_max":[90],"wind_gusts_10m_max":[47.0]}
 		}`))
 	}))
@@ -63,6 +63,9 @@ func TestGet_Success(t *testing.T) {
 	}
 	if data.CloudCover != 98 {
 		t.Errorf("CloudCover = %v, want 98", data.CloudCover)
+	}
+	if data.ApparentTemp != 19.8 {
+		t.Errorf("ApparentTemp = %v, want 19.8", data.ApparentTemp)
 	}
 }
 

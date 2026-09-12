@@ -33,7 +33,7 @@ func NewClient(baseURL string) *Client {
 func (c *Client) Get(ctx context.Context, lat, lon float64) (models.WeatherData, error) {
 	url := fmt.Sprintf(
 		"%s?latitude=%g&longitude=%g"+
-			"&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,uv_index,cloud_cover"+
+			"&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,uv_index,cloud_cover,apparent_temperature"+
 			"&daily=temperature_2m_min,temperature_2m_max,sunrise,sunset,precipitation_probability_max,wind_gusts_10m_max"+
 			"&timezone=auto",
 		c.baseURL, lat, lon,
@@ -66,6 +66,7 @@ type openMeteoResponse struct {
 		WindSpeed        float64 `json:"wind_speed_10m"`
 		UVIndex          float64 `json:"uv_index"`
 		CloudCover       int     `json:"cloud_cover"`
+		ApparentTemp     float64 `json:"apparent_temperature"`
 	} `json:"current"`
 	Daily struct {
 		TempMin              []float64 `json:"temperature_2m_min"`
@@ -142,6 +143,7 @@ func (c *Client) fetch(ctx context.Context, url string) (models.WeatherData, err
 		WindGusts:         firstFloat(parsed.Daily.WindGustsMax),
 		UVIndex:           parsed.Current.UVIndex,
 		CloudCover:        parsed.Current.CloudCover,
+		ApparentTemp:      parsed.Current.ApparentTemp,
 	}, nil
 }
 

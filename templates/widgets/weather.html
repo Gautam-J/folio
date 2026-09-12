@@ -86,6 +86,7 @@
     <div class="weather-sidebar dotted-bg"></div>
     <div class="column weather-temp-value">
       <span class="value value--xxlarge">{{printf "%.0f" .Temperature}}&deg;C</span>
+      <span class="label weather-feels">Feels like {{printf "%.0f" .ApparentTemp}}&deg;C</span>
     </div>
     <div class="column weather-highlow">
       <div class="weather-highlow__row">{{template "icon-up"}}<span class="label">{{printf "%.0f" .TempMax}}&deg;C</span></div>
