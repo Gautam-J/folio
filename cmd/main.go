@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Gautam-J/Folio/internal/config"
+	"github.com/Gautam-J/Folio/internal/github"
 	"github.com/Gautam-J/Folio/internal/handlers"
 	"github.com/Gautam-J/Folio/internal/onthisday"
 	"github.com/Gautam-J/Folio/internal/quote"
@@ -68,7 +69,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	widgets := []widget.Widget{weatherWidget, dateTimeWidget, quoteWidget, progressWidget, onThisDayWidget}
+	githubClient := github.NewClient(github.DefaultBaseURL, cfg.GitHubUsername, cfg.GitHubToken)
+
+	githubStatsWidget, err := widget.NewGitHubStatsWidget(githubClient, "templates/widgets/github.html")
+	if err != nil {
+		slog.Error("failed to init github stats widget", "error", err)
+		os.Exit(1)
+	}
+
+	widgets := []widget.Widget{weatherWidget, dateTimeWidget, quoteWidget, progressWidget, onThisDayWidget, githubStatsWidget}
 
 	renderer, err := render.NewRenderer("templates/dashboard.html", outputDir)
 	if err != nil {

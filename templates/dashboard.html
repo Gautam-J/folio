@@ -46,9 +46,31 @@
       flex: 0 0 58%;
     }
     .dashboard-aside {
+      position: relative;
       flex: 1 1 auto;
       min-width: 0;
       padding-top: calc(4px * var(--folio-scale));
+    }
+    /* Absolutely positioned (not a normal-flow sibling) so it doesn't shift
+       the on-this-day heading below it — that heading's position is
+       hand-tuned to line up with weather's "Overcast" row (see
+       .onthisday-heading below) and must not move. left:0 here resolves
+       against .dashboard-aside's own padding box, which is exactly where
+       on-this-day's own text starts (via .dashboard-aside .layout's
+       align-items:flex-start below) — so this lines up with it for free,
+       no magic-number x offset needed. Starting further left than the date
+       (which sits at .dashboard-corner's right-anchored position) means it
+       would overlap the date at the same top offset, so it starts below the
+       date's bottom edge (measured: date box is 16px + ~30px tall at
+       scale 1) instead of level with it. */
+    .dashboard-aside-top {
+      position: absolute;
+      /* Lines up with weather's high-temp ("^ 30°C") text — matched via
+         glyph position (Range.getClientRects), not the row's own
+         bounding box, since the row's box top is set by its icon, not the
+         label text's actual ink position. */
+      top: calc(73px * var(--folio-scale));
+      left: 0;
     }
     /* TRMNL's .layout centers its children both ways by default (see the
        framework .layout rule further down) — weather's own content only
@@ -82,7 +104,14 @@
     .value--xxlarge { font-size: calc(96px * var(--folio-scale)); line-height: calc(108px * var(--folio-scale)); }
     .label { font-size: calc(16px * var(--folio-scale)); }
     .weather-description { font-size: calc(28px * var(--folio-scale)); }
-    .datetime-date { font-size: calc(24px * var(--folio-scale)); }
+    /* TRMNL's .label is display:inline-flex, so the inherited text-align:right
+       from .dashboard-corner has no effect (flex layout ignores text-align;
+       it needs justify-content, which .label doesn't set, so it defaults to
+       flex-start/left). Force block so text-align applies. This only looked
+       right-aligned before the github stats widget widened the shared box —
+       with a single item, the box was exactly text-width, so left- and
+       right-aligned were visually identical. */
+    .label.datetime-date { display: block; font-size: calc(24px * var(--folio-scale)); }
     .layout.gap--large { gap: calc(20px * var(--folio-scale)); }
     /* Shrink-wrap paired stats (rather than stretching across the full row)
        and left-align them. The first column gets a fixed width so the
@@ -169,6 +198,18 @@
       right: calc(16px * var(--folio-scale));
       text-align: right;
     }
+    /* Combined with .label to beat its later-declared generic font-size in
+       the cascade regardless of source order (bit us twice with
+       .onthisday-heading/.onthisday-text). No display:block override here
+       (unlike onthisday-heading/text above) — .label's default
+       inline-flex already left-aligns via justify-content:flex-start, which
+       is what we want now that this sits left-aligned in the aside column. */
+    .label.github-stats-primary {
+      font-size: calc(20px * var(--folio-scale));
+    }
+    .label.github-stats-secondary {
+      font-size: calc(14px * var(--folio-scale));
+    }
     /* Strip (quote) and Bottom (progress bars) stack in a flex column,
        Strip above Bottom, as the second flex item in .view — pinned to the
        screen's bottom edge by .view's own space-between, not by an
@@ -217,7 +258,10 @@
       <div class="dashboard-main">
         <div class="dashboard-main-row">
           {{.Main}}
-          <div class="dashboard-aside">{{.Aside}}</div>
+          <div class="dashboard-aside">
+            <div class="dashboard-aside-top">{{.AsideTop}}</div>
+            {{.Aside}}
+          </div>
         </div>
         <div class="dashboard-corner">{{.Corner}}</div>
       </div>

@@ -13,6 +13,8 @@ type Config struct {
 	Latitude           float64 `yaml:"latitude"`
 	Longitude          float64 `yaml:"longitude"`
 	RefreshRateSeconds int     `yaml:"refresh_rate_seconds"`
+	GitHubUsername     string  `yaml:"github_username"`
+	GitHubToken        string  `yaml:"github_token"`
 }
 
 func Load(path string) (*Config, error) {

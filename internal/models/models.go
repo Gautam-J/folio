@@ -29,6 +29,14 @@ type OnThisDayData struct {
 	Text string
 }
 
+type GitHubStatsData struct {
+	ContributionsThisYear int
+	TotalStars            int
+	Commits               int
+	PullRequests          int
+	Issues                int
+}
+
 type DisplayResponse struct {
 	Status      int    `json:"status"`
 	ImageURL    string `json:"image_url,omitempty"`
